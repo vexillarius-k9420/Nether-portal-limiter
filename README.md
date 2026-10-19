@@ -1,9 +1,14 @@
 # Nether portal limiter
 
-## Setup
+| Minecraft: Java Edition | Platforms |  Supported environments   |
+|:-----------------------:|:---------:|:-------------------------:|
+|         1.20.x          |  Fabric   | Server-side, Singleplayer |
 
-For setup instructions, please see the [Fabric Documentation page](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up) related to the IDE that you are using.
-
-## License
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+## Description:
+- Customizable mod for controlling Nether portals
+- This mod will cause Nether portals to collapse if they are further than a specified distance.
+- The distance can be specified in the config.
+- The mod is completely server-side.
+- - -
+## Links:
+**Modrinth:** https://modrinth.com/mod/nether-portal-limiter_u-p
