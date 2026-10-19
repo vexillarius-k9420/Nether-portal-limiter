@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import vex.npl.config.ModConfig;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class PortalDistanceMixin {
@@ -26,11 +27,11 @@ public abstract class PortalDistanceMixin {
         ServerWorld currentLevel = player.getServerWorld();
 
         // Базовый лимит для Обычного мира
-        double limit = vex.npl.config.ModConfig.overworldLimit;
+        double limit = ModConfig.overworldLimit;
 
         // Если мы в Незере, уменьшаем лимит
         if (currentLevel.getRegistryKey() == World.NETHER) {
-            limit = vex.npl.config.ModConfig.overworldLimit / vex.npl.config.ModConfig.netherLimitScale;
+            limit = ModConfig.overworldLimit / ModConfig.netherLimitScale;
         }
 
         double dx = player.getX();
@@ -45,7 +46,7 @@ public abstract class PortalDistanceMixin {
 
                 destroyPortalEffect(player, currentLevel);
 
-                player.sendMessage(Text.literal(vex.npl.config.ModConfig.displayMessage)
+                player.sendMessage(Text.literal(ModConfig.displayMessage)
                         .formatted(Formatting.RED, Formatting.ITALIC), true);
 
                 cir.setReturnValue(player);
@@ -71,7 +72,7 @@ public abstract class PortalDistanceMixin {
 
                     // Заменяем обсидиан
                     if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
-                        if (world.random.nextFloat() < vex.npl.config.ModConfig.probabilityOfObsidianReplacement) {
+                        if (world.random.nextFloat() < ModConfig.probabilityOfObsidianReplacement) {
                             world.setBlockState(pos, Blocks.CRYING_OBSIDIAN.getDefaultState());
                         }
                     }
