@@ -14,7 +14,7 @@ public class NetherPortalLimiter implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-
+		vex.npl.config.ConfigManager.load();
 		LOGGER.info("Hello Fabric world! :P");
 	}
 

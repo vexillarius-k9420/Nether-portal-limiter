@@ -10,5 +10,6 @@
 - The distance can be specified in the config.
 - The mod is completely server-side.
 - - -
+
 ## Links:
 **Modrinth:** https://modrinth.com/mod/nether-portal-limiter_u-p
