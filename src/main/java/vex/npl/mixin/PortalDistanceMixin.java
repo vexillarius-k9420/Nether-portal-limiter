@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import vex.npl.config.ModConfig;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class PortalDistanceMixin {
@@ -25,12 +26,12 @@ public abstract class PortalDistanceMixin {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         ServerWorld currentLevel = player.getServerWorld();
 
-        // Базовый лимит для Обычного мира
-        double limit = vex.npl.config.ModConfig.overworldLimit;
+        // базовый лимит для Обычного мира
+        double limit = ModConfig.overworldLimit;
 
-        // Если мы в Незере, уменьшаем лимит
+        // уменьшение лимита для Незера
         if (currentLevel.getRegistryKey() == World.NETHER) {
-            limit = vex.npl.config.ModConfig.overworldLimit / vex.npl.config.ModConfig.netherLimitScale;
+            limit = ModConfig.overworldLimit / ModConfig.netherLimitScale;
         }
 
         double dx = player.getX();
@@ -39,13 +40,13 @@ public abstract class PortalDistanceMixin {
         double limitSq = limit * limit;
 
         if (distanceSq > limitSq) {
-            // Проверяем направления: Овер -> Незер ИЛИ Незер -> Овер
+            // определение направления: Овер->Незер ИЛИ Незер->Овер
             if ((currentLevel.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) ||
                     (currentLevel.getRegistryKey() == World.NETHER && destination.getRegistryKey() == World.OVERWORLD)) {
 
                 destroyPortalEffect(player, currentLevel);
 
-                player.sendMessage(Text.literal(vex.npl.config.ModConfig.displayMessage)
+                player.sendMessage(Text.literal(ModConfig.displayMessage)
                         .formatted(Formatting.RED, Formatting.ITALIC), true);
 
                 cir.setReturnValue(player);
@@ -58,26 +59,26 @@ public abstract class PortalDistanceMixin {
         BlockPos playerPos = player.getBlockPos();
         int radius = 4;
 
-        // Эффекты звука
+        // звук
         world.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value(), SoundCategory.BLOCKS, 1.0f, 1.0f);
 
         BlockPos.stream(playerPos.add(-radius, -radius, -radius), playerPos.add(radius, radius, radius))
                 .forEach(pos -> {
-                    // Удаляем блоки портала
+                    // удаление блоков портала
                     if (world.getBlockState(pos).isOf(Blocks.NETHER_PORTAL)) {
                         world.setBlockState(pos, Blocks.AIR.getDefaultState());
                     }
 
-                    // Заменяем обсидиан
+                    // замена обсидиана
                     if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
-                        if (world.random.nextFloat() < vex.npl.config.ModConfig.probabilityOfObsidianReplacement) {
+                        if (world.random.nextFloat() < ModConfig.probabilityOfObsidianReplacement) {
                             world.setBlockState(pos, Blocks.CRYING_OBSIDIAN.getDefaultState());
                         }
                     }
                 });
 
-        // Частицы
+        // частицы
         for (int i = 0; i < 40; i++) {
             world.spawnParticles(ParticleTypes.DRAGON_BREATH,
                     player.getX() + (world.random.nextDouble() - 0.5) * 3,

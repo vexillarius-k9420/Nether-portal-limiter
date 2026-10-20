@@ -1,4 +1,4 @@
-# Nether portal limiter
+# Nether portal limiter / _Unstable Portals_
 
 | Minecraft: Java Edition | Platforms |  Supported environments   |
 |:-----------------------:|:---------:|:-------------------------:|
