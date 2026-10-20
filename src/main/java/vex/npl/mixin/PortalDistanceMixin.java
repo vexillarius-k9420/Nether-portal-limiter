@@ -26,10 +26,10 @@ public abstract class PortalDistanceMixin {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         ServerWorld currentLevel = player.getServerWorld();
 
-        // Базовый лимит для Обычного мира
+        // базовый лимит для Обычного мира
         double limit = ModConfig.overworldLimit;
 
-        // Если мы в Незере, уменьшаем лимит
+        // уменьшение лимита для Незера
         if (currentLevel.getRegistryKey() == World.NETHER) {
             limit = ModConfig.overworldLimit / ModConfig.netherLimitScale;
         }
@@ -40,7 +40,7 @@ public abstract class PortalDistanceMixin {
         double limitSq = limit * limit;
 
         if (distanceSq > limitSq) {
-            // Проверяем направления: Овер -> Незер ИЛИ Незер -> Овер
+            // определение направления: Овер->Незер ИЛИ Незер->Овер
             if ((currentLevel.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) ||
                     (currentLevel.getRegistryKey() == World.NETHER && destination.getRegistryKey() == World.OVERWORLD)) {
 
@@ -59,18 +59,18 @@ public abstract class PortalDistanceMixin {
         BlockPos playerPos = player.getBlockPos();
         int radius = 4;
 
-        // Эффекты звука
+        // звук
         world.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value(), SoundCategory.BLOCKS, 1.0f, 1.0f);
 
         BlockPos.stream(playerPos.add(-radius, -radius, -radius), playerPos.add(radius, radius, radius))
                 .forEach(pos -> {
-                    // Удаляем блоки портала
+                    // удаление блоков портала
                     if (world.getBlockState(pos).isOf(Blocks.NETHER_PORTAL)) {
                         world.setBlockState(pos, Blocks.AIR.getDefaultState());
                     }
 
-                    // Заменяем обсидиан
+                    // замена обсидиана
                     if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
                         if (world.random.nextFloat() < ModConfig.probabilityOfObsidianReplacement) {
                             world.setBlockState(pos, Blocks.CRYING_OBSIDIAN.getDefaultState());
@@ -78,7 +78,7 @@ public abstract class PortalDistanceMixin {
                     }
                 });
 
-        // Частицы
+        // частицы
         for (int i = 0; i < 40; i++) {
             world.spawnParticles(ParticleTypes.DRAGON_BREATH,
                     player.getX() + (world.random.nextDouble() - 0.5) * 3,
