@@ -36,17 +36,20 @@ public abstract class PortalDistanceMixin {
             DtLimit = DtLimit / ConfigManager.INSTANCE.netherLimitScale;
         }
 
+        // определение координат игрока со смещением
         double dx = player.getX() - ConfigManager.INSTANCE.Center.x;
         double dz = player.getZ() - ConfigManager.INSTANCE.Center.z;
+
         double distanceSq = dx * dx + dz * dz;
         double TpLimitSq = TpLimit * TpLimit;
         double DtLimitSq = DtLimit * DtLimit;
 
         float maxL = (float) Math.max(TpLimitSq, DtLimitSq);
         float minL = (float) Math.min(TpLimitSq, DtLimitSq);
-        float probability = (float) ((distanceSq-minL) / (maxL-minL));
+        float probability = (float) ((distanceSq-minL) / (maxL-minL)); // прощёт вероятности разрушения
         float WRandom = currentLevel.random.nextFloat();
 
+        // опредиление логики лимитов
         if (TpLimitSq < DtLimitSq ? WRandom < probability : WRandom > probability){
             // определение направления: Овер->Незер ИЛИ Незер->Овер
             if ((currentLevel.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) ||
@@ -63,6 +66,7 @@ public abstract class PortalDistanceMixin {
     }
 
     @Unique
+    // СПЕЦЭФФЕКТЫ!!!
     private void destroyPortalEffect(ServerPlayerEntity player, ServerWorld world) {
         BlockPos playerPos = player.getBlockPos();
         int radius = 4;

@@ -9,7 +9,7 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/nether-portal-limiter_u-p",
-		"sources": "uhh.."
+		"sources": "https://github.com/vexillarius-k9420/Nether-portal-limiter"
 	},
 	"license": "MIT",
 	"icon": "assets/nether-portal-limiter/icon.png",
