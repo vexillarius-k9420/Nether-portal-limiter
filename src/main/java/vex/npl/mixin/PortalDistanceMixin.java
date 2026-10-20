@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vex.npl.config.ModConfig;
+import vex.npl.config.ConfigManager;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class PortalDistanceMixin {
@@ -27,26 +27,34 @@ public abstract class PortalDistanceMixin {
         ServerWorld currentLevel = player.getServerWorld();
 
         // базовый лимит для Обычного мира
-        double limit = ModConfig.overworldLimit;
+        double TpLimit = ConfigManager.INSTANCE.OverWorld.guaranteed_teleportation_distance_limit;
+        double DtLimit = ConfigManager.INSTANCE.OverWorld.guaranteed_destruction_distance_limit;
 
         // уменьшение лимита для Незера
         if (currentLevel.getRegistryKey() == World.NETHER) {
-            limit = ModConfig.overworldLimit / ModConfig.netherLimitScale;
+            TpLimit = TpLimit / ConfigManager.INSTANCE.netherLimitScale;
+            DtLimit = DtLimit / ConfigManager.INSTANCE.netherLimitScale;
         }
 
-        double dx = player.getX();
-        double dz = player.getZ();
+        double dx = player.getX() - ConfigManager.INSTANCE.Center.x;
+        double dz = player.getZ() - ConfigManager.INSTANCE.Center.z;
         double distanceSq = dx * dx + dz * dz;
-        double limitSq = limit * limit;
+        double TpLimitSq = TpLimit * TpLimit;
+        double DtLimitSq = DtLimit * DtLimit;
 
-        if (distanceSq > limitSq) {
+        float maxL = (float) Math.max(TpLimitSq, DtLimitSq);
+        float minL = (float) Math.min(TpLimitSq, DtLimitSq);
+        float probability = (float) ((distanceSq-minL) / (maxL-minL));
+        float WRandom = currentLevel.random.nextFloat();
+
+        if (TpLimitSq < DtLimitSq ? WRandom < probability : WRandom > probability){
             // определение направления: Овер->Незер ИЛИ Незер->Овер
             if ((currentLevel.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) ||
                     (currentLevel.getRegistryKey() == World.NETHER && destination.getRegistryKey() == World.OVERWORLD)) {
 
                 destroyPortalEffect(player, currentLevel);
 
-                player.sendMessage(Text.literal(ModConfig.displayMessage)
+                player.sendMessage(Text.literal(ConfigManager.INSTANCE.displayMessage)
                         .formatted(Formatting.RED, Formatting.ITALIC), true);
 
                 cir.setReturnValue(player);
@@ -72,7 +80,7 @@ public abstract class PortalDistanceMixin {
 
                     // замена обсидиана
                     if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
-                        if (world.random.nextFloat() < ModConfig.probabilityOfObsidianReplacement) {
+                        if (world.random.nextFloat() < ConfigManager.INSTANCE.ObsidianReplacement) {
                             world.setBlockState(pos, Blocks.CRYING_OBSIDIAN.getDefaultState());
                         }
                     }
