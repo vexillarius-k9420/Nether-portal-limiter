@@ -1,9 +1,8 @@
 {
 	"required": true,
-	"package": "vex.npl.client.mixin",
+	"package": "vex.npl.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-
 	],
 	"injectors": {
 		"defaultRequire": 1
