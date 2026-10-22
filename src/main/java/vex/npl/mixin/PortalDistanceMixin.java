@@ -22,12 +22,24 @@ import vex.npl.config.ConfigManager;
 @Mixin(ServerPlayerEntity.class)
 public abstract class PortalDistanceMixin {
 
-    @Inject(method = "teleportTo", at = @At("HEAD"), cancellable = true)
+    //? if 1.20-fabric {
+    @Inject(method = "moveToWorld", at = @At("HEAD"), cancellable = true)
+    private void onTeleport(ServerWorld destination, CallbackInfoReturnable<Entity> cir) {
+    //?} elif >=1.21-fabric {
+    /*@Inject(method = "teleportTo", at = @At("HEAD"), cancellable = true)
     private void onTeleport(TeleportTarget teleportTarget, CallbackInfoReturnable<Entity> cir) {
-        // проверка на телепортацию через портал (с 1.21)
-        if (teleportTarget.postDimensionTransition() != TeleportTarget.NO_OP) {
-            ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-            ServerWorld currentLevel = player.getServerWorld();
+        ServerWorld destination = teleportTarget.world();
+    *///?}
+
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        ServerWorld currentLevel = player.getServerWorld();
+
+        // проверки на телепортацию через портал (1.21+)
+        //? if 1.21-fabric {
+        /*if (teleportTarget.postDimensionTransition() != TeleportTarget.NO_OP) {
+        *///?} elif 1.21.5-fabric {
+        /*if (teleportTarget.postTeleportTransition() != TeleportTarget.NO_OP) {
+        *///?}
 
             // лимиты для Обычного мира
             double TpLimit = ConfigManager.INSTANCE.OverWorld.guaranteed_teleportation_distance_limit;
@@ -38,7 +50,6 @@ public abstract class PortalDistanceMixin {
                 TpLimit = TpLimit / ConfigManager.INSTANCE.netherLimitScale;
                 DtLimit = DtLimit / ConfigManager.INSTANCE.netherLimitScale;
             }
-
             // определение координат игрока со смещением
             double dx = player.getX() - ConfigManager.INSTANCE.Center.x;
             double dz = player.getZ() - ConfigManager.INSTANCE.Center.z;
@@ -55,8 +66,8 @@ public abstract class PortalDistanceMixin {
             // опредиление логики лимитов
             if (TpLimitSq < DtLimitSq ? WRandom < probability : WRandom > probability) {
                 // определение направления: Овер->Незер ИЛИ Незер->Овер
-                if ((currentLevel.getRegistryKey() == World.OVERWORLD && teleportTarget.world().getRegistryKey() == World.NETHER) ||
-                        (currentLevel.getRegistryKey() == World.NETHER && teleportTarget.world().getRegistryKey() == World.OVERWORLD)) {
+                if ((currentLevel.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) ||
+                        (currentLevel.getRegistryKey() == World.NETHER && destination.getRegistryKey() == World.OVERWORLD)) {
 
                     destroyPortalEffect(player, currentLevel);
 
@@ -65,7 +76,9 @@ public abstract class PortalDistanceMixin {
 
                     cir.setReturnValue(player);
                 }
-            }
+            //? if >=1.21-fabric {
+            /*}
+            *///?}
         }
     }
 
@@ -85,7 +98,6 @@ public abstract class PortalDistanceMixin {
                     if (world.getBlockState(pos).isOf(Blocks.NETHER_PORTAL)) {
                         world.setBlockState(pos, Blocks.AIR.getDefaultState());
                     }
-
                     // замена обсидиана
                     if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
                         if (world.random.nextFloat() < ConfigManager.INSTANCE.ObsidianReplacement) {

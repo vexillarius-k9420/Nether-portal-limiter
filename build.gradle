@@ -19,32 +19,57 @@ loom {
 
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft "com.mojang:minecraft:${property("minecraft_version") as String}"
+	mappings "net.fabricmc:yarn:${property("yarn_mappings") as String}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${property("loader_version") as String}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version") as String}"
 }
 
 processResources {
-	def version = project.version
+	def version = "${project.version}-${sc.current.project}"
 	inputs.property "version", version
 
+	def md_fl = stonecutter.eval(stonecutter.current.version, '>=1.21-fabric') ? ">=0.19.5" : ">=0.18.4"
+	def md_mcv = stonecutter.eval(stonecutter.current.version, '>=1.21-fabric') ? "~1.21" : "~1.20"
+	def md_java = stonecutter.eval(stonecutter.current.version, '>=1.21-fabric') ? ">=21" : ">=17"
+
+	inputs.property "md_fl", md_fl
+	inputs.property "md_mcv", md_mcv
+	inputs.property "md_java", md_java
+
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand(
+			"version": version,
+			"md_fl": md_fl,
+			"md_mcv": md_mcv,
+			"md_java": md_java
+		)
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release =
+			sc.current.parsed.matches('>=1.20.6') ? 21 :
+			sc.current.parsed.matches('>=1.18')   ? 17 :
+													16
 }
+
+def requiredJava =
+	sc.current.parsed.matches('>=1.20.6') ? JavaVersion.VERSION_21 :
+	sc.current.parsed.matches('>=1.18')   ? JavaVersion.VERSION_17 :
+											JavaVersion.VERSION_16
 
 java {
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = requiredJava
+	targetCompatibility = requiredJava
+}
+
+tasks.withType(Jar).configureEach {
+	archiveFileName = "${project.name}-${project.version}${sc.current.project}.jar"
 }
 
 jar {
@@ -66,4 +91,11 @@ publishing {
 
 	repositories {
 	}
+}
+
+tasks.named('remapSourcesJar') {
+	dependsOn tasks.named('jar')
+}
+tasks.named('remapJar') {
+	dependsOn tasks.named('sourcesJar')
 }

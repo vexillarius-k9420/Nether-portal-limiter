@@ -9,5 +9,17 @@ pluginManagement {
 	}
 }
 
-// Should match your modid
+plugins {
+	id("dev.kikugie.stonecutter").version "0.9.8"
+}
+
+stonecutter {
+	kotlinController = false
+	centralScript = "build.gradle"
+
+	create(getRootProject()) {
+		versions '1.20-fabric', '1.21-fabric', '1.21.5-fabric'
+	}
+}
+
 rootProject.name = 'nether-portal-limiter'

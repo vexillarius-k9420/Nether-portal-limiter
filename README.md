@@ -2,7 +2,7 @@
 
 | Minecraft: Java Edition | Platforms |  Supported environments   |
 |:-----------------------:|:---------:|:-------------------------:|
-|         1.21.x          |  Fabric   | Server-side, Singleplayer |
+|     1.20.x - 1.21.x     |  Fabric   | Server-side, Singleplayer |
 
 ## Description:
 - Customizable mod for controlling Nether portals
