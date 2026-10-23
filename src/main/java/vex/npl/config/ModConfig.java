@@ -14,7 +14,7 @@ public class ModConfig {
 
     public Center Center = new Center();
     public OverWorld OverWorld = new OverWorld();
-    public Float ObsidianReplacement = 0.20f;
+    public Float ObsidianReplacement = 0.17f;
     public String displayMessage = "The portal is unstable at this distance...";
     public double netherLimitScale = 8.0;
 

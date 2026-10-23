@@ -28,7 +28,7 @@ dependencies {
 }
 
 processResources {
-	def version = "${project.version}-${sc.current.project}"
+	def version = project.version
 	inputs.property "version", version
 
 	def md_fl = stonecutter.eval(stonecutter.current.version, '>=1.21-fabric') ? ">=0.19.5" : ">=0.18.4"
@@ -68,8 +68,9 @@ java {
 	targetCompatibility = requiredJava
 }
 
-tasks.withType(Jar).configureEach {
-	archiveFileName = "${project.name}-${project.version}${sc.current.project}.jar"
+remapJar {
+	// Укажите нужное имя файла целиком
+	archiveFileName = "${project.mod_name}_${version}-${stonecutter.current.version}.jar"
 }
 
 jar {

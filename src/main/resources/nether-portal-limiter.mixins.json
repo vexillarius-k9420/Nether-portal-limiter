@@ -3,7 +3,8 @@
 	"package": "vex.npl.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"PortalDistanceMixin"
+    	"PortalDistanceEntityMixin",
+		"PortalDistancePlayerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
